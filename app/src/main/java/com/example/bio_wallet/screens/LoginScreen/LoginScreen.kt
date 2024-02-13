@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,18 +22,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bio_wallet.commans.Colors
+import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.example.bio_wallet.screens.destinations.RegistrationScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Destination(start = true)
 @Composable
 fun LoginScreen(
@@ -43,6 +49,8 @@ fun LoginScreen(
     val password = remember{
         mutableStateOf("")
     }
+
+    val keyboard = LocalSoftwareKeyboardController.current
 
     Surface(color = Color.White,
         modifier = Modifier.fillMaxSize(),
@@ -68,7 +76,11 @@ fun LoginScreen(
                 label = {
                     Text(text = "Email")
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = {
+                    keyboard!!.hide()
+                })
                 )
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedTextField(value = password.value, onValueChange = {
@@ -77,11 +89,17 @@ fun LoginScreen(
                 label = {
                     Text(text = "Password")
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = {
+                    keyboard!!.hide()
+                })
                 )
             Spacer(modifier = Modifier.height(50.dp))
             Row {
-                Button(onClick = { },modifier=Modifier.width(120.dp),
+                Button(onClick = {
+                                 navigator!!.navigate(MainScreenDestination)
+                },modifier=Modifier.width(120.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray.copy(0.2f))
                     ) {
                     Text(text = "Log in",
