@@ -10,10 +10,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,10 +48,14 @@ fun MainScreen() {
                     Column(modifier = Modifier
                         .fillMaxSize()
                         .padding(start = 25.dp, end = 25.dp, top = 10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
-                        Row(horizontalArrangement = Arrangement.End) {
-                            Card(onClick = { /*TODO*/ }) {
-                                Surface {
-
+                        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                            Card(onClick = {  }, modifier = Modifier.size(40.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                                Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Settings,
+                                        contentDescription = "Settings icon",
+                                        tint = Colors.mainScreenBg
+                                    )
                                 }
                             }
                         }
@@ -69,13 +82,59 @@ fun MainScreen() {
                     .fillMaxHeight(), color = Color.White,
                     shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp)
                     ) {
+                    Column() {
+                        Spacer(modifier = Modifier.height(20.dp))
+                        LazyColumn(){
+                            items(10){
+                                TransactionHistory()
+                            }
+                        }
+                    }
                 }
             }
         }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TransactionHistory() {
+    Card(onClick = {
+
+    }, modifier = Modifier
+        .fillMaxWidth()
+        .height(100.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = Modifier
+            .padding(horizontal = 15.dp)
+            .fillMaxSize(),) {
+            Surface(color = Colors.mainScreenBg, shape = CircleShape, modifier = Modifier.size(50.dp)) {
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = "",
+                        tint = Color.White,
+                        modifier = Modifier.size(35.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(20.dp))
+            Text(text = "Amir Slanbek", fontWeight = FontWeight.Bold, color = Color.Black)
+            Spacer(modifier = Modifier.weight(0.9f))
+            Text(text = "₸ 15000", fontWeight = FontWeight.Bold, color = Colors.mainScreenBg.copy(alpha = 0.9f))
+        }
+    }
 }
 
 @Preview
 @Composable
 fun MainScreenPreview() {
     MainScreen()
+}
+
+
+
+
+@Preview
+@Composable
+fun PreviewTransactionHistory() {
+    TransactionHistory()
 }
