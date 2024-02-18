@@ -1,5 +1,6 @@
 package com.example.bio_wallet.screens.LoginScreen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,12 +29,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.bio_wallet.R
 import com.example.bio_wallet.commans.Colors
+import com.example.bio_wallet.screens.destinations.LoginOTPScreenDestination
 import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.example.bio_wallet.screens.destinations.RegistrationScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -46,12 +52,7 @@ fun LoginScreen(
     val login = remember{
         mutableStateOf("")
     }
-    val password = remember{
-        mutableStateOf("")
-    }
-
     val keyboard = LocalSoftwareKeyboardController.current
-
     Surface(color = Color.White,
         modifier = Modifier.fillMaxSize(),
         ) {
@@ -61,6 +62,7 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+            Image(painter = painterResource(id = R.drawable.wallet_icon), contentDescription ="",modifier =Modifier.size(150.dp) )
             Text(text = "Welcome back",
                     fontWeight = FontWeight.Bold,
                 fontSize = 25.sp
@@ -74,20 +76,7 @@ fun LoginScreen(
             },
                 shape = RoundedCornerShape(15.dp),
                 label = {
-                    Text(text = "Email")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = {
-                    keyboard!!.hide()
-                })
-                )
-            Spacer(modifier = Modifier.height(20.dp))
-            OutlinedTextField(value = password.value, onValueChange = {
-                password.value = it
-            }, shape = RoundedCornerShape(15.dp),
-                label = {
-                    Text(text = "Password")
+                    Text(text = "Phone")
                 },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -98,7 +87,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(50.dp))
             Row {
                 Button(onClick = {
-                                 navigator!!.navigate(MainScreenDestination)
+                                 navigator!!.navigate(LoginOTPScreenDestination)
                 },modifier=Modifier.width(120.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray.copy(0.2f))
                     ) {

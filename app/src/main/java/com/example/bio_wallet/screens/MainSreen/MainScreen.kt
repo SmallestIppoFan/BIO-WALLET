@@ -34,12 +34,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bio_wallet.commans.Colors
+import com.example.bio_wallet.screens.destinations.SettingsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
-fun MainScreen() {
+fun MainScreen(navigator:DestinationsNavigator) {
         Surface(modifier = Modifier.fillMaxSize(), color = Colors.mainScreenBg) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Surface(modifier = Modifier
@@ -49,7 +51,7 @@ fun MainScreen() {
                         .fillMaxSize()
                         .padding(start = 25.dp, end = 25.dp, top = 10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                            Card(onClick = {  }, modifier = Modifier.size(40.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                            Card(onClick = { navigator.navigate(SettingsScreenDestination) }, modifier = Modifier.size(40.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.White)) {
                                 Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                                     Icon(
                                         imageVector = Icons.Filled.Settings,
@@ -123,14 +125,6 @@ fun TransactionHistory() {
         }
     }
 }
-
-@Preview
-@Composable
-fun MainScreenPreview() {
-    MainScreen()
-}
-
-
 
 
 @Preview

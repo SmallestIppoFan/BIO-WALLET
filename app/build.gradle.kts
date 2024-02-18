@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id ("com.google.devtools.ksp") version "1.8.10-1.0.9"
+    id("com.google.gms.google-services")
 
 }
 
@@ -74,5 +75,9 @@ dependencies {
     implementation("io.github.raamcosta.compose-destinations:core:1.8.42-beta")
     ksp ("io.github.raamcosta.compose-destinations:ksp:1.8.42-beta")
     implementation ("androidx.navigation:navigation-compose:2.5.1")
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-analytics")
 
 }

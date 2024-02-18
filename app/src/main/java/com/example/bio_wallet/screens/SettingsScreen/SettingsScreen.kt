@@ -30,11 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.bio_wallet.screens.destinations.LoginScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
 
 @com.ramcosta.composedestinations.annotation.Destination
 @Composable
-fun SettingsScreen(navigator:DestinationsNavigator) {
+fun SettingsScreen(navigator: DestinationsNavigator) {
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(modifier = Modifier
             .fillMaxSize()
@@ -43,12 +45,14 @@ fun SettingsScreen(navigator:DestinationsNavigator) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "",
-                    modifier = Modifier.size(40.dp).clickable {
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clickable {
                         navigator.popBackStack()
-                    }
+                        }
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = "Settings", fontWeight = FontWeight.Bold, fontSize = 30.sp)
+                Text(text = "Settings", fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
             Spacer(modifier = Modifier.height(80.dp))
             Row(
@@ -96,17 +100,20 @@ fun SettingsScreen(navigator:DestinationsNavigator) {
             Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
                 Row(
                     horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+//                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        navigator.navigate(LoginScreenDestination)
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.ExitToApp,
                         contentDescription = "",
                         tint = Color.Red.copy(alpha = 0.5f),
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(30.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "Logout", color = Color.Red.copy(alpha = 0.5f), fontSize = 23.sp)
+                    Text(text = "Logout", color = Color.Red.copy(alpha = 0.5f), fontSize = 15.sp)
 
                 }
             }
@@ -115,21 +122,21 @@ fun SettingsScreen(navigator:DestinationsNavigator) {
 
 }
 
-@Preview
-@Composable
-fun PreviewSettingsScreen() {
-    SettingsScreen()
-}
-
+//
+//@Preview
+//@Composable
+//fun PreviewSettingsScreen() {
+//    SettingsScreen()
+//}
 @Composable
 fun InfoColumn(title:String,data:String) {
     Surface(modifier = Modifier
         .fillMaxWidth()
         .height(70.dp), color = Color.White){
         Column(modifier = Modifier.fillMaxWidth()) {
-            Text(text = title, color = Color.Gray.copy(0.4f), fontSize = 15.sp)
+            Text(text = title, color = Color.Gray.copy(0.4f), fontSize = 11.sp)
             Spacer(modifier = Modifier.height(5.dp))
-            Text(text = data, color = Color.Black, fontSize = 23.sp)
+            Text(text = data, color = Color.Black, fontSize = 18.sp)
             Spacer(modifier = Modifier.height(10.dp))
             Divider(modifier = Modifier.height(2.dp),color = Color.Gray.copy(0.4f))
         }
