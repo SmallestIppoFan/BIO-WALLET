@@ -1,6 +1,7 @@
 package com.example.bio_wallet.screens.LoginScreen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,7 +47,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-@Destination(start = true)
+@Destination
 @Composable
 fun LoginScreen(
     navigator: DestinationsNavigator?
@@ -62,19 +65,25 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-            Image(painter = painterResource(id = R.drawable.wallet_icon), contentDescription ="",modifier =Modifier.size(150.dp) )
+            Image(painter = painterResource(id = R.drawable.logo_icon), contentDescription ="",modifier =Modifier.size(100.dp) )
+            Spacer(modifier = Modifier.height(100.dp))
+
             Text(text = "Welcome back",
                     fontWeight = FontWeight.Bold,
-                fontSize = 25.sp
+                fontSize = 25.sp,
+                color = Colors.splashScreenBg
                 )
             Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "The most secure mobile wallet with biometrical date")
+            Text(text = "The most secure mobile wallet with biometrical date", color = Colors.splashScreenBg)
             Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedTextField(value =login.value , onValueChange ={
                 login.value=it
             },
-                shape = RoundedCornerShape(15.dp),
+                leadingIcon = {
+                              Icon(imageVector = Icons.Default.Phone, contentDescription ="", tint = Colors.splashScreenBg )
+                }
+                ,shape = RoundedCornerShape(15.dp),
                 label = {
                     Text(text = "Phone")
                 },
@@ -84,27 +93,27 @@ fun LoginScreen(
                     keyboard!!.hide()
                 })
                 )
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             Row {
                 Button(onClick = {
                                  navigator!!.navigate(LoginOTPScreenDestination)
-                },modifier=Modifier.width(120.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray.copy(0.2f))
+                },modifier= Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Colors.mainColorV2),
                     ) {
                     Text(text = "Log in",
-                        color = Color.Black,
+                        color = Color.White,
                         fontWeight = FontWeight.Bold
                         )
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                Button(onClick = {
-                    navigator?.navigate(RegistrationScreenDestination())
-                                 },modifier = Modifier.width(120.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Colors.mainColor)
-                    ) {
-                    Text(text = "Sign Up")
-                }
-
+            }
+            Spacer(modifier = Modifier.height(40.dp))
+            Row {
+                Text(text = "New to Wallet?")
+                Text(text = " Sign Up", color = Colors.splashScreenBg, fontWeight = FontWeight.Bold, modifier = Modifier.clickable {
+                    navigator!!.navigate(RegistrationScreenDestination)
+                })
             }
 
         }
@@ -113,7 +122,7 @@ fun LoginScreen(
 }
 
 
-//
+
 //@Preview
 //@Composable
 //fun LoginScreenPreview() {

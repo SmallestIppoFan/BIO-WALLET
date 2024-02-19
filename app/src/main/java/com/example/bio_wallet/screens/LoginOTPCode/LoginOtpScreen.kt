@@ -4,8 +4,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
@@ -39,19 +42,41 @@ fun LoginOTPScreen(navigator: DestinationsNavigator) {
     }
     val buttonEnabled = otpCode.value.length ==4
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painter = painterResource(id = R.drawable.otp_img), contentDescription ="", modifier = Modifier.size(120.dp) )
-            Text(text = "Verification", fontWeight = FontWeight.Bold, fontSize = 22.sp)
-            Text(text = "Enter OTP code send to your number", color = Color.Gray.copy(0.8f), fontSize = 18.sp)
-            Text(text = "87002450251",color = Color.Gray.copy(0.8f), fontSize = 18.sp)
-            Spacer(modifier = Modifier.height(50.dp))
-            OtpTextField(otpText = otpCode.value , onOtpTextChange ={ it, bool ->
-                otpCode.value = it
-            } )
-            Spacer(modifier = Modifier.height(50.dp))
-            Button(onClick = {navigator.navigate(MainScreenDestination) }, colors = ButtonDefaults.buttonColors(containerColor = Colors.mainColor),
-                modifier = Modifier.width(150.dp).height(50.dp), enabled = buttonEnabled) {
-                Text(text = "Continue", color = Color.White)
+        Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.locked_icon),
+                    contentDescription = "",
+                    modifier = Modifier.size(120.dp)
+                )
+                Text(text = "Verification", fontWeight = FontWeight.Bold, fontSize = 22.sp)
+                Text(
+                    text = "Enter OTP code send to your number",
+                    color = Color.Gray.copy(0.8f),
+                    fontSize = 18.sp
+                )
+                Text(text = "87002450251", color = Color.Gray.copy(0.8f), fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(50.dp))
+                OtpTextField(otpText = otpCode.value, onOtpTextChange = { it, bool ->
+                    otpCode.value = it
+                })
+            }
+            Column(modifier = Modifier.fillMaxSize().padding(10.dp), verticalArrangement = Arrangement.Bottom) {
+                Button(
+                    onClick = { navigator.navigate(MainScreenDestination) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Colors.splashScreenBg),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    enabled = buttonEnabled
+                ) {
+                    Text(text = "Continue", color = Color.White)
+                }
+
             }
         }
     }

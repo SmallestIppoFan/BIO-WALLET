@@ -4,6 +4,7 @@ package com.example.bio_wallet.screens.RegisterScreen
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,11 +16,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -29,6 +33,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -44,17 +49,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
+import com.example.bio_wallet.R
 import com.example.bio_wallet.commans.Colors
 import com.example.bio_wallet.commans.Constants
 import com.example.bio_wallet.commans.mobileNumberFilter
-import com.example.bio_wallet.screens.destinations.LoginScreenDestination
 import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -62,7 +69,9 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
 @Composable
-fun RegistrationScreen(navigator:DestinationsNavigator) {
+fun RegistrationScreen(
+    navigator:DestinationsNavigator
+) {
     val context = LocalContext.current
 
     val keyboard = LocalSoftwareKeyboardController.current
@@ -107,36 +116,70 @@ fun RegistrationScreen(navigator:DestinationsNavigator) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.9f)
+                    .fillMaxHeight(0.9f),
+                color = Colors.splashScreenBg
+
             ) {
-                Column(modifier=Modifier.padding(13.dp)) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "", modifier = Modifier.clickable { if (step.value==0){
-                        navigator.navigate(LoginScreenDestination)
-                    }else{
-                        step.value--
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.25f),
+                        color = Colors.splashScreenBg
+                    ) {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row(
+                                verticalAlignment = Alignment.Top,
+                                horizontalArrangement = Arrangement.Start,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .clickable {
+                                            if (step.value == 0) {
+                                                navigator.popBackStack()
+                                            } else {
+                                                step.value--
+                                            }
+                                        }
+                                        .padding(10.dp),
+                                    tint = Color.White
+                                    )
+
+                            }
+                            Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+                                Text(text = "Sign Up", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 35.sp)
+                            }
+                        }
                     }
-                    })
-                    Spacer(modifier = Modifier.height(30.dp))
-                    when (step.value) {
-                        0 -> {
-                            FirstStep(firstName, secondName,isKazakh, keyboard!!)
-                        }
+                    Surface(modifier = Modifier.fillMaxWidth(),
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
+                        ) {
+                        when (step.value) {
+                            0 -> {
+                                FirstStep(firstName, secondName, isKazakh, keyboard!!)
+                            }
 
-                        1 -> {
-                            SecondStep(number, keyboard!!)
-                        }
+                            1 -> {
+                                SecondStep(number, keyboard!!)
+                            }
 
-                        2 -> {
-                            ThirdStep(passFirst, passSecond, termsAccept, keyboard!!)
-                        }
-                        3 ->{
+                            2 -> {
+                                ThirdStep(passFirst, passSecond, termsAccept, keyboard!!)
+                            }
+
+                            3 -> {
                             LastStep()
+                            }
                         }
                     }
                 }
 
             }
-            Surface(modifier = Modifier.fillMaxSize()
+            Surface(modifier = Modifier.fillMaxSize(),
+                color = Color.White
                 ) {
                 Column(modifier = Modifier
                     .fillMaxSize()
@@ -159,13 +202,14 @@ fun RegistrationScreen(navigator:DestinationsNavigator) {
                         modifier= Modifier
                             .fillMaxWidth()
                             .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Colors.mainColor),
+                        colors = ButtonDefaults.buttonColors(containerColor = Colors.splashScreenBg),
                         enabled = (firstName.value != "" && secondName.value != "" && isKazakh.value && step.value==0)||
-                                (step.value==1 && number.value != "") || (step.value==2 && passFirst.value.length >= 8 && passSecond.value.length >=8 && termsAccept.value) || step.value ==4
+                                (step.value==1 && number.value != "") || (step.value==2 && passFirst.value.length >= 8 && passSecond.value.length >=8 && termsAccept.value) || step.value ==3
                         ) {
                         Text(
                             text = "Continue",
-                            fontSize = 21.sp
+                            fontSize = 21.sp,
+                            color = Color.White
                         )
 
                     }
@@ -180,12 +224,16 @@ fun RegistrationScreen(navigator:DestinationsNavigator) {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun FirstStep(firstName:MutableState<String>,secondName:MutableState<String>,isKazakh:MutableState<Boolean>,keyboard:SoftwareKeyboardController) {
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
             ) {
+            Spacer(modifier = Modifier.height(40.dp))
             Text(text = "What's your name?",
                 fontWeight = FontWeight.Bold,
-                fontSize = 25.sp
+                fontSize = 25.sp,
+                color = Colors.splashScreenBg
             )
             Column(horizontalAlignment = Alignment.Start,
                 modifier = Modifier.fillMaxWidth(),
@@ -194,15 +242,16 @@ fun FirstStep(firstName:MutableState<String>,secondName:MutableState<String>,isK
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(text = "First Name",
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Gray.copy(0.5f)
                     )
                 Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(value = firstName.value, onValueChange ={
+                TextField(value = firstName.value, onValueChange ={
                     firstName.value=it
                 } ,modifier= Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors( unfocusedBorderColor = Color.Gray.copy(0.7f)),
+                    colors = TextFieldDefaults.outlinedTextFieldColors( unfocusedBorderColor = Color.Gray.copy(0.5f)),
                     keyboardActions = KeyboardActions(onDone = {
                         keyboard.hide()
                     }),
@@ -212,15 +261,16 @@ fun FirstStep(firstName:MutableState<String>,secondName:MutableState<String>,isK
                 Spacer(modifier = Modifier.height(15.dp))
                 Text(text = "Last Name",
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Gray.copy(0.5f)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(value = secondName.value, onValueChange ={
+                TextField(value = secondName.value, onValueChange ={
                     secondName.value=it
                 } ,modifier= Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors( unfocusedBorderColor = Color.Gray.copy(0.7f)),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(unfocusedBorderColor = Color.Gray.copy(0.5f)),
                     keyboardActions = KeyboardActions(onDone = {
                         keyboard.hide()
                     }),
@@ -234,10 +284,10 @@ fun FirstStep(firstName:MutableState<String>,secondName:MutableState<String>,isK
                         checked = isKazakh.value, onCheckedChange = {
                             isKazakh.value = it
                         },
-                        colors = CheckboxDefaults.colors(checkedColor = Colors.mainColor)
+                        colors = CheckboxDefaults.colors(checkedColor = Colors.splashScreenBg)
                     )
                     Text(text = "I am a citizen of Kazakhstan",
-                        color = Color.Black.copy(alpha = 0.8f),
+                        color = Color.Gray.copy(0.5f),
                         fontSize = 15.sp
                         )
                 }
@@ -251,9 +301,10 @@ fun FirstStep(firstName:MutableState<String>,secondName:MutableState<String>,isK
 fun SecondStep(number:MutableState<String>,keyboard: SoftwareKeyboardController) {
     val requester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
-    Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier=Modifier.fillMaxSize(),  horizontalAlignment = Alignment.CenterHorizontally) {
+        Spacer(modifier = Modifier.height(100.dp))
         Text(text = "Enter your phone number",
-            color = Color.Black,
+            color = Colors.splashScreenBg,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
             )
@@ -300,15 +351,19 @@ fun SecondStep(number:MutableState<String>,keyboard: SoftwareKeyboardController)
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun ThirdStep(passFirst:MutableState<String>,passSecond:MutableState<String>,termsAccept:MutableState<Boolean>,keyboard: SoftwareKeyboardController) {
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(10.dp), 
+//        verticalArrangement = Arrangement.Center
     ) {
+        Spacer(modifier = Modifier.height(25.dp))
         Text(text = "Create a secure password",
             fontWeight = FontWeight.Bold,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color=Colors.splashScreenBg
         )
         Spacer(modifier = Modifier.height(15.dp))
         Text(text = "Your password should be at least 8 characters.",
@@ -322,7 +377,7 @@ fun ThirdStep(passFirst:MutableState<String>,passSecond:MutableState<String>,ter
             Spacer(modifier = Modifier.height(20.dp))
             Text(text = "Password",
                 fontSize = 15.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(value = passFirst.value, onValueChange ={
@@ -333,13 +388,16 @@ fun ThirdStep(passFirst:MutableState<String>,passSecond:MutableState<String>,ter
                 colors = TextFieldDefaults.outlinedTextFieldColors( unfocusedBorderColor = Color.Gray.copy(0.7f)),
                 keyboardActions = KeyboardActions(onDone = {
                     keyboard.hide()
-                }),maxLines = 1,                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                }),maxLines = 1,                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Lock, contentDescription ="" )
+                }
 
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(text = "Repeat password again",
                 fontSize = 15.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
             Spacer(modifier = Modifier.height(10.dp))
             OutlinedTextField(value = passSecond.value, onValueChange ={
@@ -351,7 +409,10 @@ fun ThirdStep(passFirst:MutableState<String>,passSecond:MutableState<String>,ter
                 keyboardActions = KeyboardActions(onDone = {
                     keyboard.hide()
                 }),maxLines = 1,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                leadingIcon = {
+                    Icon(imageVector = Icons.Default.Lock, contentDescription ="" )
+                }
 
             )
 
@@ -360,7 +421,7 @@ fun ThirdStep(passFirst:MutableState<String>,passSecond:MutableState<String>,ter
                     checked = termsAccept.value, onCheckedChange = {
                         termsAccept.value = it
                     },
-                    colors = CheckboxDefaults.colors(checkedColor = Colors.mainColor)
+                    colors = CheckboxDefaults.colors(checkedColor = Colors.splashScreenBg)
                 )
                 Text(text = "By continuing, you agree to our Terms of Service and Privacy Policy.",
                     color = Color.Black.copy(alpha = 0.8f),
@@ -371,20 +432,17 @@ fun ThirdStep(passFirst:MutableState<String>,passSecond:MutableState<String>,ter
     }
 }
 
-
 @Composable
 fun LastStep() {
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Spacer(modifier = Modifier.height(20.dp))
+            Image(painter = painterResource(id = R.drawable.facescan_icon), contentDescription ="" , modifier = Modifier.size(250.dp))
 
+        }
+    }
 }
 
-
-//@SuppressLint("UnrememberedMutableState")
-//@Preview
-//@Composable
-//fun FirstStepPrev() {
-//    FirstStep(firstName = mutableStateOf(""), secondName = mutableStateOf(""), isKazakh =mutableStateOf(false) )
-//}
-//
 
 
 
