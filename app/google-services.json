@@ -1,10 +1,30 @@
 {
   "project_info": {
     "project_number": "63863602739",
+    "firebase_url": "https://biowallet-46e71-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "biowallet-46e71",
     "storage_bucket": "biowallet-46e71.appspot.com"
   },
   "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63863602739:android:5110ee9ea5472cc85c2d46",
+        "android_client_info": {
+          "package_name": "com.example.amir"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDAQSXhOtZXPvXqmOcHOQ3ZpXVDidzu4A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:63863602739:android:c6af95e3d613e7835c2d46",

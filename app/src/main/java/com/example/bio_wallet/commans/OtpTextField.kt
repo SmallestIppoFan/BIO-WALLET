@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 fun OtpTextField(
     modifier: Modifier = Modifier,
     otpText: String,
-    otpCount: Int = 4,
+    otpCount: Int = 6,
     onOtpTextChange: (String, Boolean) -> Unit
 ) {
     val localSoftwareKeyboardController = LocalSoftwareKeyboardController.current

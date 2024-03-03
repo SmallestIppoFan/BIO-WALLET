@@ -35,8 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bio_wallet.R
 import com.example.bio_wallet.commans.Colors
+import com.example.bio_wallet.model.auth.UserAuthData
 import com.example.bio_wallet.screens.destinations.LoginScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -44,8 +46,11 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @com.ramcosta.composedestinations.annotation.Destination
 @Composable
 fun SettingsScreen(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: SettingsScreenViewModel = hiltViewModel()
 ) {
+
+
     Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
         Column(
             modifier = Modifier
@@ -62,7 +67,7 @@ fun SettingsScreen(
                     modifier = Modifier
                         .size(30.dp)
                         .clickable {
-                        navigator.popBackStack()
+                            navigator.popBackStack()
                         }
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -108,11 +113,11 @@ fun SettingsScreen(
                 .fillMaxHeight(0.85f)
                 .padding(20.dp)) {
                 Spacer(modifier = Modifier.height(40.dp))
-                InfoColumn("First Name", "Anthony",Icons.Default.Person)
+                InfoColumn("First Name", UserAuthData.currentUser?.name.toString(),Icons.Default.Person)
                 Spacer(modifier = Modifier.height(20.dp))
-                InfoColumn("Second Name", "smith",Icons.Default.Person)
+                InfoColumn("Second Name", UserAuthData.currentUser?.surname.toString(),Icons.Default.Person)
                 Spacer(modifier = Modifier.height(20.dp))
-                InfoColumn("Number", "87002450251",Icons.Default.Phone)
+                InfoColumn("Number", UserAuthData.currentUser?.phone.toString(),Icons.Default.Phone)
                 Spacer(modifier = Modifier.height(50.dp))
             }
             Column(
@@ -130,7 +135,8 @@ fun SettingsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clickable {
-//                        navigator.navigate(LoginScreenDestination)
+                                viewModel.signOut()
+                                navigator.popBackStack(LoginScreenDestination,false)
                             }
                             .padding(10.dp)
                     ) {

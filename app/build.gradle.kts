@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id ("com.google.devtools.ksp") version "1.8.10-1.0.9"
     id("com.google.gms.google-services")
+    id("com.google.dagger.hilt.android")
+    kotlin("kapt")
 
 }
 
@@ -54,7 +56,13 @@ android {
 }
 
 dependencies {
+    //hilt
+    implementation("com.google.dagger:hilt-android:2.44")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.1")
@@ -79,5 +87,13 @@ dependencies {
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-database")
 
+    //Authentication
+    implementation("com.google.firebase:firebase-auth")
+
+
+}
+kapt {
+    correctErrorTypes = true
 }

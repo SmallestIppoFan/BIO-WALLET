@@ -1,5 +1,6 @@
 package com.example.bio_wallet.screens.TransactionScreen
 
+import android.util.Log
 import android.widget.Space
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Phone
@@ -22,6 +25,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
@@ -30,33 +34,71 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bio_wallet.R
+import com.example.bio_wallet.Status
 import com.example.bio_wallet.commans.Colors
+import com.example.bio_wallet.commans.CustomAlertDialog
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 @Destination
-fun TransactionScreen(navigator: DestinationsNavigator) {
+fun TransactionScreen(navigator: DestinationsNavigator,
+                      transactionViewModel: TransactionViewModel = hiltViewModel()
+                      ) {
+    val state by transactionViewModel.state.collectAsState()
+
     val number = remember{
-        mutableStateOf("706 4199278")
+        mutableStateOf("")
     }
     val moneyAmount = remember {
-        mutableStateOf("1250 T")
+        mutableStateOf("")
     }
+
+    val showDialog = remember{ mutableStateOf(Pair(false,"") )}
+    val showReceiver = remember{ mutableStateOf(Pair(false,"")) }
+
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(key1 = Unit, block = {
+        transactionViewModel.eventFlow.collect {
+            when (it) {
+                is TransactionEvent.ShowDialog -> {
+                    showDialog.value= Pair(it.show,it.text)
+                    number.value = ""
+                }
+                is TransactionEvent.ShowReceiver ->{
+                    showReceiver.value = Pair(true,it.receiver)
+                }
+            }
+        }
+    })
+    LaunchedEffect(key1 = number.value, block ={
+        if (number.value.length ==9){
+          transactionViewModel.getAccountByPhone(number.value)
+        }
+    } )
     Surface(modifier = Modifier.fillMaxSize(), color = Colors.splashScreenBg) {
         Column(modifier = Modifier.fillMaxSize()) {
             Surface(
@@ -102,75 +144,172 @@ fun TransactionScreen(navigator: DestinationsNavigator) {
                 color = Color.White,
                 shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
             ) {
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(15.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(15.dp)
+                ) {
                     Spacer(modifier = Modifier.height(20.dp))
-                    Text(text = "Bank Account", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                        Image(painter = painterResource(id = R.drawable.logo_icon), contentDescription = "", modifier = Modifier.size(35.dp))
+                    Text(
+                        text = "Bank Account",
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_icon),
+                            contentDescription = "",
+                            modifier = Modifier.size(35.dp)
+                        )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(text = "Wallet Gold", fontWeight = FontWeight.Medium, fontSize = 16.sp)
                         Spacer(modifier = Modifier.weight(0.6f))
-                        Text(text = "15 000 T", fontWeight = FontWeight.Medium, fontSize = 17.sp)
+                        Text(
+                            text = "${state.profileInfo.money} T",
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 17.sp
+                        )
                     }
                     Spacer(modifier = Modifier.height(10.dp))
-                    Text(text = "Sender Phone", color = Color.Black, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                    Text(
+                        text = "Sender Phone",
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
                         TextField(
                             value = number.value,
-                            onValueChange = {
-                                number.value = it
+                            onValueChange = { newValue ->
+                                if (newValue.length <= 10 || newValue.length < number.value.length) {
+                                    number.value = newValue
+                                }
                             },
                             modifier = Modifier.fillMaxWidth(),
                             leadingIcon = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(imageVector = Icons.Default.Phone, contentDescription = "")
-                                    Text(text = "+7", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                                    Text(
+                                        text = "+7",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp
+                                    )
                                 }
                             },
                             colors = TextFieldDefaults.textFieldColors(
                                 textColor = Color.Black,
                                 containerColor = Color.Transparent
                             ),
-                            textStyle = TextStyle(fontSize =16.sp )
+                            textStyle = TextStyle(fontSize = 16.sp),
+                            maxLines = 1,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(onDone = {
+                                keyboard!!.hide()
+                            })
                         )
                     }
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Image(painter = painterResource(id = R.drawable.user_icon), contentDescription ="" , modifier = Modifier.size(50.dp))
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(text = "Abay Kunanbaev", fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                    if (showReceiver.value.first) {
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp), verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            ReceiverData(showReceiver.value.second)
+                        }
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(text = "Set amount", fontWeight = FontWeight.Medium, fontSize = 17.sp)
                     Spacer(modifier = Modifier.height(5.dp))
-                    Text(text = "How much would like to transfer?",  fontSize = 17.sp,color = Color.Gray.copy(0.5f))
+                    Text(
+                        text = "How much would like to transfer?",
+                        fontSize = 17.sp,
+                        color = Color.Gray.copy(0.5f)
+                    )
                     Spacer(modifier = Modifier.height(15.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                        TextField(value =moneyAmount.value, onValueChange ={
-                            moneyAmount.value=it
-                        }, colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent),
-                            textStyle = TextStyle(color = Color.Black, fontSize = 25.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
-
-                            )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextField(
+                            value = moneyAmount.value,
+                            onValueChange = {
+                                moneyAmount.value = it
+                            },
+                            colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent),
+                            textStyle = TextStyle(
+                                color = Color.Black,
+                                fontSize = 25.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            maxLines = 1,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(onDone = {
+                                keyboard!!.hide()
+                            })
+                        )
                     }
-                    Column(modifier = Modifier.fillMaxSize().height(60.dp), verticalArrangement = Arrangement.Bottom) {
-                        Button(onClick = {  }, colors = ButtonDefaults.buttonColors(containerColor = Colors.splashScreenBg), modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .height(60.dp), verticalArrangement = Arrangement.Bottom
+                    ) {
+                        Button(
+                            onClick = { transactionViewModel.confirmTransaction(moneyAmount.value.toInt()) },
+                            colors = ButtonDefaults.buttonColors(containerColor = Colors.splashScreenBg),
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = state.senderUserUID != ""
+                        ) {
                             Text(text = "Continue", color = Color.White, fontSize = 17.sp)
                         }
                     }
                 }
             }
         }
-
+        if (state.localLoadingStatus==Status.SHOW_LOADING){
+            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Log.d("asdasdasda","herere1")
+                CircularProgressIndicator()
+            }
+        }
+        if (showDialog.value.first){
+            CustomAlertDialog(alertText =showDialog.value.second) {
+                showDialog.value= Pair(false,"")
+            }
+        }
     }
+}
+
+@Composable
+private fun ReceiverData(name:String) {
+    Image(
+        painter = painterResource(id = R.drawable.user_icon),
+        contentDescription = "",
+        modifier = Modifier.size(50.dp)
+    )
+    Spacer(modifier = Modifier.width(10.dp))
+    Text(text = name, fontWeight = FontWeight.Bold, fontSize = 17.sp)
 }
 
 

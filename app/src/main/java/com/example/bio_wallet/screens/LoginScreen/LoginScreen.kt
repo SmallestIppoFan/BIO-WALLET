@@ -56,6 +56,7 @@ fun LoginScreen(
         mutableStateOf("")
     }
     val keyboard = LocalSoftwareKeyboardController.current
+
     Surface(color = Color.White,
         modifier = Modifier.fillMaxSize(),
         ) {
@@ -77,26 +78,34 @@ fun LoginScreen(
             Text(text = "The most secure mobile wallet with biometrical date", color = Colors.splashScreenBg)
             Spacer(modifier = Modifier.height(20.dp))
 
-            OutlinedTextField(value =login.value , onValueChange ={
-                login.value=it
-            },
-                leadingIcon = {
-                              Icon(imageVector = Icons.Default.Phone, contentDescription ="", tint = Colors.splashScreenBg )
-                }
-                ,shape = RoundedCornerShape(15.dp),
-                label = {
-                    Text(text = "Phone")
+            OutlinedTextField(
+                value = login.value,
+                onValueChange = {
+                    login.value = it
                 },
+                leadingIcon = {
+                    Row {
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Icon(
+                            imageVector = Icons.Default.Phone,
+                            contentDescription = "",
+                            tint = Colors.splashScreenBg
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(text = "+7")
+                    }
+                },
+                shape = RoundedCornerShape(15.dp),
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
                     keyboard!!.hide()
-                })
-                )
+                }),
+            )
             Spacer(modifier = Modifier.height(40.dp))
             Row {
                 Button(onClick = {
-                                 navigator!!.navigate(LoginOTPScreenDestination)
+                                 navigator!!.navigate(LoginOTPScreenDestination(phone = "+7${login.value}"))
                 },modifier= Modifier
                     .fillMaxWidth()
                     .height(60.dp),

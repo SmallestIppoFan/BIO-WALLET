@@ -1,5 +1,6 @@
 package com.example.bio_wallet.screens.MainSreen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -24,20 +25,25 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bio_wallet.R
 import com.example.bio_wallet.commans.Colors
 import com.example.bio_wallet.screens.destinations.SettingsScreenDestination
@@ -45,12 +51,17 @@ import com.example.bio_wallet.screens.destinations.TransactionScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun MainScreen(
-    navigator:DestinationsNavigator
+    navigator:DestinationsNavigator,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
+
         Surface(modifier = Modifier.fillMaxSize(), color = Colors.splashScreenBg) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Surface(modifier = Modifier
@@ -82,7 +93,7 @@ fun MainScreen(
                             fontSize = 40.sp
                         )
                             Spacer(modifier = Modifier.width(20.dp))
-                            Text(text = "150000",
+                            Text(text = state.profileInfo.money ?: "",
                                 fontSize = 60.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color.White
@@ -137,6 +148,12 @@ fun MainScreen(
                     }
                 }
             }
+            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                if (state.loading== LoadingState.Loading) {
+                    CircularProgressIndicator()
+                }
+            }
+
         }
 }
 
@@ -151,7 +168,8 @@ fun TransactionHistory(name:String, price:String) {
         .padding(start = 10.dp, end = 10.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = Modifier
             .padding(horizontal = 15.dp)
-            .fillMaxSize().height(80.dp),) {
+            .fillMaxSize()
+            .height(80.dp),) {
             Image(painter = painterResource( R.drawable.transaction_history_icon), contentDescription ="", modifier = Modifier.size(50.dp) )
             Spacer(modifier = Modifier.width(20.dp))
             Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
