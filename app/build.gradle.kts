@@ -92,6 +92,21 @@ dependencies {
     //Authentication
     implementation("com.google.firebase:firebase-auth")
 
+    // CameraX core library
+    val camerax_version = "1.1.0-alpha06"
+    implementation ("androidx.camera:camera-camera2:$camerax_version")
+    implementation ("androidx.camera:camera-lifecycle:$camerax_version")
+    implementation ("androidx.camera:camera-core:$camerax_version")
+
+    // CameraX View class
+    implementation ("androidx.camera:camera-view:1.0.0-alpha24")
+
+
+    implementation ("com.google.accompanist:accompanist-permissions:0.15.0")
+    implementation ("com.google.mlkit:face-detection:16.0.2")
+
+
+
 
 }
 kapt {

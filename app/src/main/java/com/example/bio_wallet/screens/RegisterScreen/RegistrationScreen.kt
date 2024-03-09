@@ -3,7 +3,12 @@
 package com.example.bio_wallet.screens.RegisterScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
+import android.view.ViewGroup
 import android.widget.Toast
+import androidx.camera.core.CameraSelector
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,10 +59,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.LifecycleOwner
 import com.example.bio_wallet.R
 import com.example.bio_wallet.commans.Colors
 import com.example.bio_wallet.commans.Constants
@@ -65,6 +72,11 @@ import com.example.bio_wallet.commans.mobileNumberFilter
 import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import androidx.camera.core.Preview
+import androidx.compose.runtime.LaunchedEffect
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
@@ -82,7 +94,6 @@ fun RegistrationScreen(
     }
 
 
-    //first screen vals
     val firstName = remember{
         mutableStateOf("")
     }
@@ -93,7 +104,6 @@ fun RegistrationScreen(
         mutableStateOf(false)
     }
 
-    //second screen vals
     val number = remember{
         mutableStateOf("")
     }
@@ -167,11 +177,11 @@ fun RegistrationScreen(
                             }
 
                             2 -> {
-                                ThirdStep(passFirst, passSecond, termsAccept, keyboard!!)
+                                LastStep()
                             }
 
                             3 -> {
-                            LastStep()
+                                CameraScreen()
                             }
                         }
                     }
@@ -204,7 +214,7 @@ fun RegistrationScreen(
                             .height(50.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Colors.splashScreenBg),
                         enabled = (firstName.value != "" && secondName.value != "" && isKazakh.value && step.value==0)||
-                                (step.value==1 && number.value != "") || (step.value==2 && passFirst.value.length >= 8 && passSecond.value.length >=8 && termsAccept.value) || step.value ==3
+                                (step.value==1 && number.value != "")  || step.value ==2 || step.value ==3
                         ) {
                         Text(
                             text = "Continue",
@@ -445,6 +455,52 @@ fun LastStep() {
 
 
 
+@Composable
+fun CameraPreview() {
+    val context = LocalContext.current
+    AndroidView(factory = { ctx ->
+        val previewView = PreviewView(ctx).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    (context as LifecycleOwner), cameraSelector, preview
+                )
+            } catch (exc: Exception) {
+                Log.e("CameraPreview", "Use case binding failed", exc)
+            }
+        }, ContextCompat.getMainExecutor(context))
+        previewView
+    }, update = {})
+}
 
-
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun CameraScreen() {
+    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+    when {
+        cameraPermissionState.hasPermission -> {
+            CameraPreview()
+        }
+        cameraPermissionState.shouldShowRationale -> {
+            Text("Camera permission is needed to capture photos")
+        }
+        else -> {
+            LaunchedEffect(true) {
+                cameraPermissionState.launchPermissionRequest()
+            }
+        }
+    }
+}
