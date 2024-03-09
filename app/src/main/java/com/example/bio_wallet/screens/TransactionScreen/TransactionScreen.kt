@@ -1,9 +1,11 @@
 package com.example.bio_wallet.screens.TransactionScreen
 
+import android.os.Build
 import android.util.Log
-import android.widget.Space
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,8 +24,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,7 +50,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -58,9 +57,13 @@ import com.example.bio_wallet.R
 import com.example.bio_wallet.Status
 import com.example.bio_wallet.commans.Colors
 import com.example.bio_wallet.commans.CustomAlertDialog
+import com.example.bio_wallet.commans.TransactionCheck
+import com.example.bio_wallet.model.TransactionData
+import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 @Destination
@@ -78,6 +81,7 @@ fun TransactionScreen(navigator: DestinationsNavigator,
 
     val showDialog = remember{ mutableStateOf(Pair(false,"") )}
     val showReceiver = remember{ mutableStateOf(Pair(false,"")) }
+    val showCheck = remember { mutableStateOf(Pair(false, TransactionData())) }
 
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -91,11 +95,14 @@ fun TransactionScreen(navigator: DestinationsNavigator,
                 is TransactionEvent.ShowReceiver ->{
                     showReceiver.value = Pair(true,it.receiver)
                 }
+                is TransactionEvent.ShowCheck ->{
+                    showCheck.value = Pair(it.show,it.transactionData)
+                }
             }
         }
     })
     LaunchedEffect(key1 = number.value, block ={
-        if (number.value.length ==9){
+        if (number.value.length ==10){
           transactionViewModel.getAccountByPhone(number.value)
         }
     } )
@@ -114,9 +121,11 @@ fun TransactionScreen(navigator: DestinationsNavigator,
                     horizontalArrangement = Arrangement.Start
                 ) {
                     OutlinedCard(
-                        modifier = Modifier.size(40.dp),
+                        modifier = Modifier.size(40.dp).clickable {
+                                                                  navigator.navigate(MainScreenDestination)
+                        },
                         colors = CardDefaults.outlinedCardColors(containerColor = Colors.splashScreenBg),
-                        border = BorderStroke(width = 1.dp, color = Color.Gray.copy(alpha = 0.5f))
+                        border = BorderStroke(width = 1.dp, color = Color.Gray.copy(alpha = 0.85f))
                     ) {
                         Column(
                             verticalArrangement = Arrangement.Center,
@@ -296,6 +305,12 @@ fun TransactionScreen(navigator: DestinationsNavigator,
         if (showDialog.value.first){
             CustomAlertDialog(alertText =showDialog.value.second) {
                 showDialog.value= Pair(false,"")
+            }
+        }
+        if (showCheck.value.first){
+            TransactionCheck(transactionData = showCheck.value.second){
+                showCheck.value = Pair(false, TransactionData())
+                navigator.navigate(MainScreenDestination)
             }
         }
     }

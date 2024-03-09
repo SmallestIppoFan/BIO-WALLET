@@ -32,8 +32,11 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +49,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bio_wallet.R
 import com.example.bio_wallet.commans.Colors
+import com.example.bio_wallet.commans.TransactionCheck
+import com.example.bio_wallet.model.TransactionData
+import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.example.bio_wallet.screens.destinations.SettingsScreenDestination
 import com.example.bio_wallet.screens.destinations.TransactionScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
@@ -61,6 +67,19 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
+    val showTransactionCheck = remember{
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = Unit){
+        viewModel.eventFlow.collect {
+            when (it) {
+                is MainTransactionEvent.ShowCheck -> {
+                    showTransactionCheck.value = it.show
+                }
+            }
+        }
+    }
 
         Surface(modifier = Modifier.fillMaxSize(), color = Colors.splashScreenBg) {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -137,12 +156,15 @@ fun MainScreen(
                             Spacer(modifier = Modifier.width(40.dp))
                         }
                         LazyColumn(){
-                            items(1){
-                                TransactionHistory("Olzhas Askar", "860")
-                                TransactionHistory("Damir Omarber","1100")
-                                TransactionHistory("Saina Shalapina","400")
-                                TransactionHistory("Abay Kynanbaev","1350")
-                                TransactionHistory("Mukhtar Ayezov","5000")
+                            if (state.transactionList != null) {
+                                items(state.transactionList!!.size) {
+                                    TransactionHistory(
+                                        state.transactionList!![it].fullName,
+                                        state.transactionList!![it].amount
+                                    ){
+                                        viewModel.getTransactionDataById(state.transactionList!![it].id)
+                                    }
+                                }
                             }
                         }
                     }
@@ -153,15 +175,22 @@ fun MainScreen(
                     CircularProgressIndicator()
                 }
             }
+            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                if (showTransactionCheck.value) {
+                    TransactionCheck(transactionData = state.checkData){
+                        showTransactionCheck.value = false
+                    }
+                }
+            }
 
         }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TransactionHistory(name:String, price:String) {
+fun TransactionHistory(name:String, price:String,onClick: () ->Unit) {
     Card(onClick = {
-
+        onClick()
     }, modifier = Modifier
         .fillMaxWidth()
         .height(80.dp)
@@ -173,11 +202,11 @@ fun TransactionHistory(name:String, price:String) {
             Image(painter = painterResource( R.drawable.transaction_history_icon), contentDescription ="", modifier = Modifier.size(50.dp) )
             Spacer(modifier = Modifier.width(20.dp))
             Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-                Text(text = "Transation", fontWeight = FontWeight.Bold, color = Color.Black)
+                Text(text = "Transaction", fontWeight = FontWeight.Bold, color = Color.Black)
                 Text(text = name, fontWeight = FontWeight.Bold, color = Color.Gray.copy(0.8f))
             }
             Spacer(modifier = Modifier.weight(0.9f))
-            Text(text = "₸ $price", fontWeight = FontWeight.Bold, color = Color.Black)
+            Text(text = "$price ₸", fontWeight = FontWeight.Bold, color = Color.Black)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.bio_wallet.di
 
+import com.example.bio_wallet.repository.FirebaseRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -21,6 +22,10 @@ object AppModule {
     @Provides
     fun provideFirebaseAuth(): FirebaseAuth = Firebase.auth
 
-
+    @Singleton
+    @Provides
+    fun provideRepository():FirebaseRepository = FirebaseRepository(provideFirebaseDatabase(),
+        provideFirebaseAuth()
+    )
 
 }
