@@ -88,6 +88,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-database")
+    implementation ("com.google.firebase:firebase-storage-ktx:20.3.0")
 
     //Authentication
     implementation("com.google.firebase:firebase-auth")
@@ -104,6 +105,9 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-permissions:0.15.0")
     implementation ("com.google.mlkit:face-detection:16.0.2")
+
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
 
 

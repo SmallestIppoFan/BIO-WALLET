@@ -37,6 +37,8 @@ import com.example.bio_wallet.commans.OtpTextField
 import com.example.bio_wallet.screens.FaceScreen.FaceCheckScreen
 import com.example.bio_wallet.screens.destinations.FaceCheckScreenDestination
 import com.example.bio_wallet.screens.destinations.MainScreenDestination
+import com.example.bio_wallet.screens.destinations.RegistrationScreenDestination
+import com.example.bio_wallet.screens.destinations.TransactionScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.collect
@@ -58,11 +60,15 @@ fun LoginOTPScreen(navigator: DestinationsNavigator,viewModel: LoginOtpViewModel
         viewModel.eventFlow.collect {event ->
             when(event){
                 LoginOtpViewModel.OtpResult.Success ->{
-                    navigator.navigate(FaceCheckScreenDestination)
+                    navigator.navigate(FaceCheckScreenDestination())
                 }
                 LoginOtpViewModel.OtpResult.Failure ->{
 
                 }
+                LoginOtpViewModel.OtpResult.NEW ->{
+                    navigator.navigate(RegistrationScreenDestination(step = 2,phone))
+                }
+
             }
         }
     } )

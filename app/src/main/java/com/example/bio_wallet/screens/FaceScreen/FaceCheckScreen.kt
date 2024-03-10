@@ -8,19 +8,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Destination
 @Composable
-fun FaceCheckScreen(navigator: DestinationsNavigator) {
+fun FaceCheckScreen(navigator: DestinationsNavigator,
+                    viewModel: FaceCheckViewModel= hiltViewModel()
+                    ) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp), verticalArrangement = Arrangement.Bottom) {
+            .padding(10.dp), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
             Button(onClick = { navigator.navigate(MainScreenDestination)}) {
 
             }

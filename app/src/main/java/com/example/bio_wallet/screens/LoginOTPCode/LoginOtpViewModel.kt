@@ -81,8 +81,16 @@ class LoginOtpViewModel @Inject constructor(private val firebaseAuth: FirebaseAu
                     if (task.isSuccessful) {
                         Log.d("PHONE_AUTH","logged in")
                         UserAuthData.UID = task.result.user!!.uid
-                        viewModelScope.launch {
-                            channel.send(OtpResult.Success)
+                        val isNewUser = task.result.additionalUserInfo?.isNewUser == true
+                        if (isNewUser){
+                            viewModelScope.launch {
+                                channel.send(OtpResult.NEW)
+                            }
+                        }
+                        else {
+                            viewModelScope.launch {
+                                channel.send(OtpResult.Success)
+                            }
                         }
                     } else {
                         if (task.exception is FirebaseAuthInvalidCredentialsException) {
@@ -93,11 +101,12 @@ class LoginOtpViewModel @Inject constructor(private val firebaseAuth: FirebaseAu
                         }
                     }
                 }
-        }
+    }
 
     enum class OtpResult {
         Success,
-        Failure
+        Failure,
+        NEW
     }
 
 }

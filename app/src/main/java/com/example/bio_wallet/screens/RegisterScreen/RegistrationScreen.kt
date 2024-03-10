@@ -3,10 +3,15 @@
 package com.example.bio_wallet.screens.RegisterScreen
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
@@ -73,24 +78,59 @@ import com.example.bio_wallet.screens.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import androidx.camera.core.Preview
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.bio_wallet.MainActivity.FileUtils.getOutputDirectory
+import com.example.bio_wallet.screens.LoginOTPCode.LoginOTPScreen
+import com.example.bio_wallet.screens.destinations.LoginOTPScreenDestination
+import com.example.bio_wallet.screens.destinations.LoginScreenDestination
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
+import java.io.File
+import java.nio.file.Files.createFile
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalComposeUiApi::class)
 @Destination
 @Composable
 fun RegistrationScreen(
-    navigator:DestinationsNavigator
+    navigator:DestinationsNavigator,
+    viewModel: RegistrationViewModel = hiltViewModel(),
+    step:Int = 0,
+    number:String = ""
 ) {
+    val showLoading = remember{
+        mutableStateOf(false)
+    }
+
     val context = LocalContext.current
+    LaunchedEffect(key1 = viewModel.channelFlow, block ={
+        viewModel.channelFlow.collect{
+            when(it){
+                is RegistrationEvents.ShowLoading ->{
+                    showLoading.value = it.show
+                }
+                RegistrationEvents.Navigate ->{
+                    navigator.navigate(LoginScreenDestination)
+                    Toast.makeText(context,"Account has created",Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    } )
 
     val keyboard = LocalSoftwareKeyboardController.current
 
 
     val step = remember{
-        mutableStateOf(0)
+        mutableStateOf(step)
     }
 
 
@@ -105,20 +145,10 @@ fun RegistrationScreen(
     }
 
     val number = remember{
-        mutableStateOf("")
+        mutableStateOf(number)
     }
 
 
-    //last step screen val
-    val passFirst = remember {
-        mutableStateOf("")
-    }
-    val passSecond = remember{
-        mutableStateOf("")
-    }
-    val termsAccept = remember {
-        mutableStateOf(false)
-    }
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -169,19 +199,24 @@ fun RegistrationScreen(
                         ) {
                         when (step.value) {
                             0 -> {
-                                FirstStep(firstName, secondName, isKazakh, keyboard!!)
-                            }
-
-                            1 -> {
                                 SecondStep(number, keyboard!!)
                             }
 
-                            2 -> {
-                                LastStep()
+                            1 -> {
+                                navigator.navigate(LoginOTPScreenDestination("+7${number.value}"))
+                            }
+                            2->{
+                                FirstStep(firstName, secondName, isKazakh, keyboard!!)
                             }
 
                             3 -> {
-                                CameraScreen()
+                                LastStep()
+                            }
+
+                            4 -> {
+                                CameraScreen(savePhoto = {
+                                    viewModel.createPhoto(it, name = firstName.value, surname = secondName.value, money = 0, phone = number.value)
+                                })
                             }
                         }
                     }
@@ -197,15 +232,8 @@ fun RegistrationScreen(
                     verticalArrangement = Arrangement.Bottom
                     ) {
                     Button(onClick = {
-                        if (step.value != 3) {
-                            if (step.value==2 && passFirst.value!=passSecond.value){
-                                Toast.makeText(context,"Passwords do not match",Toast.LENGTH_SHORT).show()
-                            }else {
+                        if (step.value != 4) {
                                 step.value++
-                            }
-                        }
-                        else{
-                            navigator.navigate(MainScreenDestination)
                         }
 
                     },
@@ -214,7 +242,7 @@ fun RegistrationScreen(
                             .height(50.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Colors.splashScreenBg),
                         enabled = (firstName.value != "" && secondName.value != "" && isKazakh.value && step.value==0)||
-                                (step.value==1 && number.value != "")  || step.value ==2 || step.value ==3
+                                (step.value==1 && number.value != "")  || step.value ==2 || step.value ==3 || step.value != 4
                         ) {
                         Text(
                             text = "Continue",
@@ -224,6 +252,11 @@ fun RegistrationScreen(
 
                     }
                 }
+            }
+        }
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            if (showLoading.value){
+                CircularProgressIndicator()
             }
         }
     }
@@ -455,44 +488,19 @@ fun LastStep() {
 
 
 
-@Composable
-fun CameraPreview() {
-    val context = LocalContext.current
-    AndroidView(factory = { ctx ->
-        val previewView = PreviewView(ctx).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        }
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-        cameraProviderFuture.addListener({
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
-            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
-            try {
-                cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(
-                    (context as LifecycleOwner), cameraSelector, preview
-                )
-            } catch (exc: Exception) {
-                Log.e("CameraPreview", "Use case binding failed", exc)
-            }
-        }, ContextCompat.getMainExecutor(context))
-        previewView
-    }, update = {})
-}
-
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraScreen() {
+fun CameraScreen(savePhoto: (Uri) -> Unit) {
+    var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
+    imageCapture = ImageCapture.Builder().build()
     val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
     when {
         cameraPermissionState.hasPermission -> {
-            CameraPreview()
+            Box(modifier = Modifier.fillMaxSize()) {
+                CameraPreview(imageCapture)
+                CaptureButton(Modifier.align(Alignment.BottomCenter),imageCapture,savePhoto = savePhoto)
+            }
         }
         cameraPermissionState.shouldShowRationale -> {
             Text("Camera permission is needed to capture photos")
@@ -504,3 +512,81 @@ fun CameraScreen() {
         }
     }
 }
+
+@Composable
+fun CameraPreview(imageCapture:ImageCapture?) {
+
+    AndroidView(factory = { context ->
+        PreviewView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+    }, update = { previewView ->
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(previewView.context)
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+
+
+            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    previewView.context as LifecycleOwner, cameraSelector, preview, imageCapture
+                )
+            } catch (exc: Exception) {
+                Log.e("CameraPreview", "Use case binding failed", exc)
+            }
+        }, ContextCompat.getMainExecutor(previewView.context))
+    })
+
+    LaunchedEffect(imageCapture) {
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun CaptureButton(modifier: Modifier = Modifier, imageCapture: ImageCapture? = null,savePhoto:(Uri)->Unit) {
+    lateinit var outputDirectory: File
+    val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    val context = LocalContext.current
+
+    outputDirectory = getOutputDirectory(context)
+
+
+    Button(onClick = { imageCapture?.let {
+        val photoFile = createFile(outputDirectory, FILENAME_FORMAT)
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        it.takePicture(
+            outputOptions, ContextCompat.getMainExecutor(context),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
+                    Log.d("asdsadw31","code is here")
+                    savePhoto(savedUri)
+                }
+
+                override fun onError(exc: ImageCaptureException) {
+                    Log.e("CameraXApp", "Photo capture failed: ${exc.message}", exc)
+                }
+            }
+        )
+    }
+
+    }, modifier = modifier) {
+        Text("Capture")
+    }
+}
+
+fun createFile(baseFolder: File, format: String, extension: String = ".jpg") =
+    File(baseFolder, SimpleDateFormat(format, Locale.US)
+        .format(System.currentTimeMillis()) + extension)
+
+

@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -18,14 +19,42 @@ import javax.inject.Inject
 class FirebaseRepository @Inject constructor(private val firebaseDatabase: FirebaseDatabase,
     private val firebaseAuth: FirebaseAuth
     ){
-    private val userRef = firebaseDatabase.reference.child("Username").child(UserAuthData.UID!!)
+
+    private val userRef = firebaseDatabase.reference.child("Username")
+
     private val transactionRef = firebaseDatabase.reference.child("Transactions")
 
 
-    init {
+
+
+    fun createUser(name:String,
+                   surname:String,
+                   money:Int,
+                   phone:String,
+                   faceId:String,
+                   onSuccess:() ->Unit,
+                   onDone: () ->Unit
+                   ){
+        val data = mapOf("name" to name,
+                        "surname" to surname,
+            "money" to money,
+            "phone" to phone,
+            "faceId" to faceId
+            )
+        firebaseDatabase.reference.child("Username").child(UserAuthData.UID!!).updateChildren(data).addOnCompleteListener {
+            if (it.isSuccessful){
+                Log.d("asdas123","123sad")
+                onSuccess()
+            }
+            else{
+                onDone()
+                Log.d("asdas123","123sad123")
+            }
+        }
+
     }
     fun getProfile(onSuccess:() ->Unit,onDone:() -> Unit){
-        userRef.addValueEventListener(object : ValueEventListener {
+        userRef.child(UserAuthData.UID!!).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val response = dataSnapshot.value
                 UserAuthData.currentUser = UserAuthData.transformToUserModel(response.toString())
@@ -40,9 +69,11 @@ class FirebaseRepository @Inject constructor(private val firebaseDatabase: Fireb
     }
 
     fun getProfileTransaction(onSuccess:(List<MainScreenTransactionData>) ->Unit,onDone:() -> Unit) {
-        userRef.child("transactionId").addValueEventListener(object : ValueEventListener {
+        userRef.child(UserAuthData.UID!!).child("transactionId").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                onSuccess(parseTransactions(snapshot.value.toString()))
+                if (snapshot.value != null) {
+                    onSuccess(parseTransactions(snapshot.value.toString()))
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {

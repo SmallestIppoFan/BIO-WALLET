@@ -108,7 +108,8 @@ class MainViewModel @Inject constructor(private val firebaseDatabase: FirebaseDa
         }
         _state.update {
             it.copy(
-                loading = LoadingState.Done            )
+                loading = LoadingState.Done
+            )
         }
     }
 

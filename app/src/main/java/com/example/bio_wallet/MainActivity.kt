@@ -1,5 +1,6 @@
 package com.example.bio_wallet
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,10 +19,12 @@ import com.ramcosta.composedestinations.rememberNavHostEngine
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,6 +39,15 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+    object FileUtils {
+        fun getOutputDirectory(context: Context): File {
+            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
+                File(it, context.resources.getString(R.string.app_name)).apply { mkdirs() }
+            }
+            return if (mediaDir != null && mediaDir.exists())
+                mediaDir else context.filesDir
         }
     }
 }

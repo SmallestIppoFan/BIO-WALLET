@@ -121,7 +121,7 @@ fun LoginScreen(
             Row {
                 Text(text = "New to Wallet?")
                 Text(text = " Sign Up", color = Colors.splashScreenBg, fontWeight = FontWeight.Bold, modifier = Modifier.clickable {
-                    navigator!!.navigate(RegistrationScreenDestination)
+                    navigator!!.navigate(RegistrationScreenDestination())
                 })
             }
 
