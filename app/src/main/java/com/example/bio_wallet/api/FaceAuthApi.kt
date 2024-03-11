@@ -9,9 +9,11 @@ import retrofit2.http.POST
 interface FaceAuthApi {
     @POST("/photo/compare")
     @Headers("token: $api_key") // Replace with your actual API key
-    fun compareFaces(
+    fun authFace(
         @Body request: CompareFacesRequest
     ): Call<CompareFacesResponse>
+
+    @POST("/v2/person")
 
     data class CompareFacesRequest(
         val photo1: String, // URL or identifier for the first photo
