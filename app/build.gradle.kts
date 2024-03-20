@@ -61,7 +61,6 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -78,36 +77,32 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
     //navigation
     implementation("io.github.raamcosta.compose-destinations:core:1.8.42-beta")
     ksp ("io.github.raamcosta.compose-destinations:ksp:1.8.42-beta")
     implementation ("androidx.navigation:navigation-compose:2.5.1")
-
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-database")
     implementation ("com.google.firebase:firebase-storage-ktx:20.3.0")
-
     //Authentication
     implementation("com.google.firebase:firebase-auth")
-
     // CameraX core library
     val camerax_version = "1.1.0-alpha06"
     implementation ("androidx.camera:camera-camera2:$camerax_version")
     implementation ("androidx.camera:camera-lifecycle:$camerax_version")
     implementation ("androidx.camera:camera-core:$camerax_version")
-
     // CameraX View class
     implementation ("androidx.camera:camera-view:1.0.0-alpha24")
-
-
     implementation ("com.google.accompanist:accompanist-permissions:0.15.0")
     implementation ("com.google.mlkit:face-detection:16.0.2")
-
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
 
 

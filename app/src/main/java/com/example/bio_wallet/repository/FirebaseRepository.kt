@@ -16,17 +16,9 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 
-class FirebaseRepository @Inject constructor(private val firebaseDatabase: FirebaseDatabase,
-    private val firebaseAuth: FirebaseAuth
-    ){
-
+class FirebaseRepository @Inject constructor(private val firebaseDatabase: FirebaseDatabase){
     private val userRef = firebaseDatabase.reference.child("Username")
-
     private val transactionRef = firebaseDatabase.reference.child("Transactions")
-
-
-
-
     fun createUser(name:String,
                    surname:String,
                    money:Int,
@@ -43,12 +35,10 @@ class FirebaseRepository @Inject constructor(private val firebaseDatabase: Fireb
             )
         firebaseDatabase.reference.child("Username").child(UserAuthData.UID!!).updateChildren(data).addOnCompleteListener {
             if (it.isSuccessful){
-                Log.d("asdas123","123sad")
                 onSuccess()
             }
             else{
                 onDone()
-                Log.d("asdas123","123sad123")
             }
         }
 

@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bio_wallet.repository.FirebaseRepository
+import com.example.bio_wallet.repository.LuxandRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -22,12 +23,12 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class RegistrationViewModel @Inject constructor(private val repository: FirebaseRepository):ViewModel() {
+class RegistrationViewModel @Inject constructor(private val repository: FirebaseRepository,
+                    private val luxandRepository: LuxandRepository
+    ):ViewModel() {
 
     private val channel = Channel<RegistrationEvents>()
     val channelFlow = channel.receiveAsFlow()
-
-
     private fun createUser(
         name: String,
         surname: String,
@@ -42,7 +43,9 @@ class RegistrationViewModel @Inject constructor(private val repository: Firebase
             phone = phone,
             faceId = faceId,
             onSuccess = {
-                onDone()
+                onDone(
+
+                )
             },
             onDone = {
                 onDone()
@@ -62,7 +65,6 @@ class RegistrationViewModel @Inject constructor(private val repository: Firebase
         photoRef.putFile(savedUri).addOnSuccessListener {
             photoRef.downloadUrl.addOnSuccessListener { downloadUri ->
                 savePhotoUrlToFirestore(downloadUri.toString(),name,surname,money,phone)
-
             }
             }.addOnFailureListener {
             }.addOnCompleteListener {
@@ -80,6 +82,9 @@ class RegistrationViewModel @Inject constructor(private val repository: Firebase
         }
     }
 
+    private fun addFaceToDb(){
+
+    }
 
 
 }

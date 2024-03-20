@@ -24,7 +24,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginOtpViewModel @Inject constructor(private val firebaseAuth: FirebaseAuth) : ViewModel() {
-
     private val firebaseAuthSettings = firebaseAuth.firebaseAuthSettings
     var verificationCode:String =""
 
