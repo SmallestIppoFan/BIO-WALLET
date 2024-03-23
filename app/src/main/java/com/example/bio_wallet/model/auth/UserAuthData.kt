@@ -1,5 +1,6 @@
 package com.example.bio_wallet.model.auth
 
+import android.util.Log
 import com.example.bio_wallet.model.UserModel
 
 object UserAuthData{
@@ -17,7 +18,8 @@ object UserAuthData{
             name = map["name"],
             surname = map["surname"],
             phone = map["phone"],
-            money = map["money"]
+            money = map["money"],
+            faceId = map["faceId"]
         )
     }
 }

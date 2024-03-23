@@ -4,7 +4,6 @@ import com.example.bio_wallet.api.FaceAuthApi
 import com.example.bio_wallet.commans.Constants
 import com.example.bio_wallet.commans.Constants.api_key
 import com.example.bio_wallet.repository.FirebaseRepository
-import com.example.bio_wallet.repository.LuxandRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth

@@ -569,7 +569,6 @@ fun CaptureButton(modifier: Modifier = Modifier, imageCapture: ImageCapture? = n
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
-                    Log.d("asdsadw31","code is here")
                     savePhoto(savedUri)
                 }
 

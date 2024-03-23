@@ -57,7 +57,7 @@ class TransactionViewModel @Inject constructor(private val firebaseDatabase: Fir
                 channel.send(TransactionEvent.ShowDialog(true, "Cant send money to your wallet"))
             }
         } else {
-            usersRef.orderByChild("phone").equalTo("7$phone")
+            usersRef.orderByChild("phone").equalTo("+7$phone")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         if (dataSnapshot.exists()) {

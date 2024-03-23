@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bio_wallet.repository.FirebaseRepository
-import com.example.bio_wallet.repository.LuxandRepository
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -23,9 +22,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class RegistrationViewModel @Inject constructor(private val repository: FirebaseRepository,
-                    private val luxandRepository: LuxandRepository
-    ):ViewModel() {
+class RegistrationViewModel @Inject constructor(private val repository: FirebaseRepository):ViewModel() {
 
     private val channel = Channel<RegistrationEvents>()
     val channelFlow = channel.receiveAsFlow()
@@ -68,9 +65,7 @@ class RegistrationViewModel @Inject constructor(private val repository: Firebase
             }
             }.addOnFailureListener {
             }.addOnCompleteListener {
-
         }
-
     }
 
     private fun savePhotoUrlToFirestore(photoUrl: String, name:String,surname: String,money: Int,phone: String) {
