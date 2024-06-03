@@ -47,7 +47,9 @@ class FirebaseRepository @Inject constructor(private val firebaseDatabase: Fireb
         userRef.child(UserAuthData.UID!!).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val response = dataSnapshot.value
+                Log.d("ASdasd1231",response.toString())
                 UserAuthData.currentUser = UserAuthData.transformToUserModel(response.toString())
+                Log.d("ASdasd1231",UserAuthData.currentUser.toString())
                 onSuccess()
             }
 

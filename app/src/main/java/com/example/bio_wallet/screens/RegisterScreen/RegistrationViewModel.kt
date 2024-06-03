@@ -58,13 +58,16 @@ class RegistrationViewModel @Inject constructor(private val repository: Firebase
         val storageRef = Firebase.storage.reference
         val fileName = savedUri.lastPathSegment ?: "image_${System.currentTimeMillis()}"
         val photoRef = storageRef.child("photos/$fileName")
+        Log.d("test123asd","$storageRef $fileName $photoRef")
 
         photoRef.putFile(savedUri).addOnSuccessListener {
             photoRef.downloadUrl.addOnSuccessListener { downloadUri ->
                 savePhotoUrlToFirestore(downloadUri.toString(),name,surname,money,phone)
             }
             }.addOnFailureListener {
+                Log.d("test123asd","$$it")
             }.addOnCompleteListener {
+            Log.d("test123asd","$it")
         }
     }
 

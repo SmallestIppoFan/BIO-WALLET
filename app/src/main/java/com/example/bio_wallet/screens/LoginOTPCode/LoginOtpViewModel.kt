@@ -80,6 +80,7 @@ class LoginOtpViewModel @Inject constructor(private val firebaseAuth: FirebaseAu
                     if (task.isSuccessful) {
                         Log.d("PHONE_AUTH","logged in")
                         UserAuthData.UID = task.result.user!!.uid
+
                         val isNewUser = task.result.additionalUserInfo?.isNewUser == true
                         if (isNewUser){
                             viewModelScope.launch {

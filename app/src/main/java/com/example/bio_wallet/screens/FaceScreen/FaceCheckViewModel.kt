@@ -36,11 +36,6 @@ class FaceCheckViewModel @Inject constructor(private val repository: FirebaseRep
     val channelFlow = channel.receiveAsFlow()
 
 
-    init {
-        uploadImageUrls("https://images.vanityfair.it/gallery/118215/Big/dcc12cf2-a504-4339-8997-aae9a697fbf9.jpg",
-            "https://w.forfun.com/fetch/77/776537aadb1c0e106a49d76e730ebd3e.jpeg"
-            )
-    }
 
     fun createPhoto(savedUri: Uri) {
         viewModelScope.launch {
@@ -50,10 +45,12 @@ class FaceCheckViewModel @Inject constructor(private val repository: FirebaseRep
         val fileName = savedUri.lastPathSegment ?: "image_${System.currentTimeMillis()}"
         val photoRef = storageRef.child("photos/$fileName")
 
+
+
         photoRef.putFile(savedUri).addOnSuccessListener {
             photoRef.downloadUrl.addOnSuccessListener { downloadUri ->
                 repository.getProfile(onSuccess = {
-//                    Log.d("Asdqws12312",UserAuthData.currentUser!!.faceId.toString())
+                    Log.d("ASdasd123123",UserAuthData.currentUser!!.faceId.toString())
                     uploadImageUrls(downloadUri.toString() , UserAuthData.currentUser!!.faceId.toString())
                 }, onDone = {})
             }
@@ -108,7 +105,7 @@ interface MyBackendService {
     fun uploadImageUrls(@Body imageUrls: ImageUrls): Call<ResponseBody>
 }
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.1.164:5000/"
+    private const val BASE_URL = "http://192.168.8.6:5000/"
 
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
